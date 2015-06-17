@@ -1,0 +1,49 @@
+<#@ template hostspecific="true" language="C#"#>
+<#@ output extension=".cs"#>
+<#@ assembly name="System.Xml" #>
+<#@ import namespace="System.IO"#>
+<#@ import namespace="System.Xml"#>
+<#@ import namespace="System.Text"#>
+<#
+    string file_name= this.Host.ResolvePath("DbXmlData.xml");
+#>
+namespace EntityGenerator
+{
+    <# 
+    XmlDocument doc= new XmlDocument();
+    doc.Load(file_name);
+    XmlNodeList nodes =  doc.DocumentElement.SelectNodes("/Tables/Table");
+    foreach (XmlNode n in nodes)
+    {
+#>
+public class <#=n.Attributes["Name"].InnerText#>
+    {
+<# 
+        foreach (XmlNode inner in n.ChildNodes)
+        { 
+            if (inner.Name=="Column")
+            {#>
+        public <#=Get <#=GetFormatedColName(inner.Attributes["Name"].InnerText) #>
+        {
+            get;
+            set;
+        }
+<#
+            }
+        }                                           
+#>
+    }
+<#
+    }
+    #>
+}
+<#+
+string GetFormatedColName(string name)
+{
+        return name.ToLower();
+}
+string GetColumnType(XmlNode n)
+    {
+
+}
+#>
